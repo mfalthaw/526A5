@@ -38,10 +38,16 @@ def create_rule(items):
             raise ValueError('Error: invalid ip.')
 
         port = items[3]
-        if (port == '*') \
-            or (port in range(0, 65536)):
-            # TODO handle multiple ports
+        multi_port = port.split(',')
+        if (port == '*') or (len(multi_port) == 1 and port in range(0, 65536)):
             rule['port'] = port
+        elif len(multi_port) > 1:
+            ports = []
+            for p in multi_port:
+                p = int(p)
+                if p in range(0, 65536):
+                    ports.append(p)
+            rule['port'] = ports
         else:
             raise ValueError('Error: invalid port.')
 
