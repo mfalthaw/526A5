@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 ''' fw.py '''
 
+import sys
 import argparse
 
 # list of dictinaries
@@ -90,6 +91,23 @@ def read_configs(filename):
     file.close()    
     print('Done reading config file: {}'.format(filename))
 
+def handle_packet(packet):
+    '''
+    handle packet based on rules
+    '''
+
+def read_packets():
+    '''
+    read packet file from stdin
+    '''
+    for line in sys.stdin:
+        line = line.strip()
+        try:
+            packet = line.split()
+            handle_packet(packet)
+        except ValueError:
+            print('Error reading packets.')
+
 def parse_args():
     '''
     Handles parsing arguments and returning arugments list
@@ -111,7 +129,8 @@ def print_rules():
 def main():
     args = parse_args()
     read_configs(args.rules_filename)
-    print_rules()
+    # print_rules()
+    read_packets()
 
 if __name__ == '__main__':
     main()
