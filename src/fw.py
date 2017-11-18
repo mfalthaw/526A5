@@ -65,6 +65,7 @@ def parse_args():
 
 def main():
     args = parse_args()
+    read_configs(args.rules_filename)
 
 if __name__ == '__main__':
     main()
