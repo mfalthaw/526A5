@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 ''' fw.py '''
 
-import sys
-import string
 import argparse
 
 # list of dictinaries
 rules = []
+
+DEBUG = True
 
 def create_rule(items):
     '''
@@ -84,7 +84,8 @@ def read_configs(filename):
             try:
                 rules.append(create_rule(items))
             except ValueError as e:
-                print(e)
+                if DEBUG:
+                    print(e)
 
     file.close()    
     print('Done reading config file: {}'.format(filename))
