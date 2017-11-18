@@ -15,27 +15,36 @@ def create_rule(items):
     line format: <direction> <action> <ip> <port> [flag]
     '''
     rule = {}
-
-    # no flag used
-    if len(items) == 4:
-        pass
-    # flag used    
-    elif len(items) == 5:
-        pass
+    
+    if len(items) in (4, 5):
+        rule['direction'] = items[0].lower()
+        rule['action'] = items[1].lower()
+        rule['ip'] = items[2]
+        rule['port'] = items[3]
+        if len(items) == 5:
+            # if flag used
+            rule['flag'] = items[4]
+        else:
+            rule['flag'] = None
     # unsupported length
     else:
         raise ValueError('Error: line contains unexpected number of items: {}\nMust be 4 or 5.'.format(len(items)))
+    
+    # return new rule
+    return rule
 
 def read_configs(filename):
     '''
     read config file
     '''
+    global rules
+
     with open(filename) as file:
         for line in file:
             line = line.strip()
             items = line.split()
             
-            create_rule(items)
+            rules.append(create_rule(items))
 
     file.close()    
     print('Done reading config file: {}'.format(filename))
