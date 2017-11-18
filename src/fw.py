@@ -39,8 +39,11 @@ def create_rule(items):
 
         port = items[3]
         multi_port = port.split(',')
-        if (port == '*') or (len(multi_port) == 1 and port in range(0, 65536)):
-            rule['port'] = port
+        if len(multi_port) == 1:
+            if (port == '*') or (int(port) in range(0, 65536)):
+                rule['port'] = port
+            else:
+                raise ValueError('Error: invalid port.')
         elif len(multi_port) > 1:
             ports = []
             for p in multi_port:
@@ -49,6 +52,7 @@ def create_rule(items):
                     ports.append(p)
             rule['port'] = ports
         else:
+            print('port: {}'.format(multi_port))
             raise ValueError('Error: invalid port.')
 
         if len(items) == 5:
@@ -99,10 +103,14 @@ def parse_args():
     
     return parser.parse_args()
 
+def print_rules():
+    for rule in rules:
+        print(rule)
+
 def main():
     args = parse_args()
     read_configs(args.rules_filename)
-    print(rules)
+    print_rules()
 
 if __name__ == '__main__':
     main()
