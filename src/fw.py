@@ -5,6 +5,8 @@ import sys
 import string
 import argparse
 
+import utils
+
 # list of dictionaries
 rules = []
 packets = []
@@ -199,6 +201,7 @@ def main():
     # print_list(rules)
     read_packets()
     # print_list(packets)
+    # print(utils.compare_ips('8.8.7.8', '8.8.8.8', 8))
 
 if __name__ == '__main__':
     main()
