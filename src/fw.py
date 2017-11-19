@@ -35,10 +35,15 @@ def create_rule(items):
         
         # ip
         ip = items[2]
-        if (ip == '*') \
-            or (ip.count('.') == 3) \
-            or (ip.count('.') == 3  and ip.count('/') == 1):
+        if ip == '*':
             rule['ip'] = ip
+        elif ip.count('/') == 1:
+            addr, mask = ip.split('/')
+            if validate_ip(addr):
+                # TODO handle mask
+                rule['ip'] = ip
+            else:
+                raise ValueError('Error: invalid ip.')
         else:
             raise ValueError('Error: invalid ip.')
 
@@ -116,14 +121,16 @@ def verify_packet(dir, ip, port, flag):
     # dir
     if dir not in ('in', 'out'):
         return False
-    
     # ip
-    return validate_ip()
-    
+    if not validate_ip(ip):
+        return False
     # port
+    if port not in range(0, 65536):
+        return False
     # flag
-
-    retrun True
+    if flag not in ('1', '0'):
+        return False
+    return True
 
 def handle_packet(packet):
     '''
@@ -148,8 +155,8 @@ def read_packets():
         line = line.strip()
         try:
             handle_packet(line)
-        except ValueError, e:
-            print('Error reading packets.' + e)
+        except ValueError:
+            print('Error reading packets.')
 
 def parse_args():
     '''
