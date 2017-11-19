@@ -5,7 +5,7 @@ import sys
 import string
 import argparse
 
-# list of dictinaries
+# list of dictionaries
 rules = []
 packets = []
 
@@ -25,14 +25,14 @@ def create_rule(items):
         if direction in ('in', 'out'):
             rule['direction'] = direction
         else:
-            raise ValueError('Error: direction unrecogonized.')
+            raise ValueError('Error: direction unrecognized.')
         
         # action
         action = items[1].lower()
         if action in ('accept', 'reject', 'drop'):
             rule['action'] = action
         else:
-            raise ValueError('Error: action unrecogonized.')
+            raise ValueError('Error: action unrecognized.')
         
         # ip
         ip = items[2]
@@ -156,7 +156,8 @@ def handle_packet(packet):
     packet_dic['flag'] = flag
 
     packets.append(packet_dic)
-    # compare to rules and emit resuls
+    
+    # compare to rules and emit results
 
 def read_packets():
     '''
@@ -171,7 +172,7 @@ def read_packets():
 
 def parse_args():
     '''
-    Handles parsing arguments and returning arugments list
+    Handles parsing arguments and returning arguments list
     Reference: https://docs.python.org/3/library/argparse.h
     '''
     usage = 'python3 fw.py rules_filename'
