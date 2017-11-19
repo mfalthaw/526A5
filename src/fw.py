@@ -7,6 +7,7 @@ import argparse
 
 # list of dictinaries
 rules = []
+packets = []
 
 DEBUG = True
 
@@ -125,26 +126,36 @@ def verify_packet(dir, ip, port, flag):
     if not validate_ip(ip):
         return False
     # port
-    if port not in range(0, 65536):
+    if int(port) not in range(0, 65536):
         return False
     # flag
     if flag not in ('1', '0'):
         return False
+
     return True
 
 def handle_packet(packet):
     '''
     handle packet based on rules
     '''
+    packet_dic = {}
+    global packets
+
     try:
         dir, ip, port, flag = packet.split()
     except ValueError:
         raise ValueError('Can\'t split packet.')
-    
+
     verified = verify_packet(dir, ip, port, flag)
     if not verified:
         raise ValueError('Error: invalid packet.')
     
+    packet_dic['direction'] = dir
+    packet_dic['ip'] = ip
+    packet_dic['port'] = port
+    packet_dic['flag'] = flag
+
+    packets.append(packet_dic)
     # compare to rules and emit resuls
 
 def read_packets():
@@ -155,8 +166,8 @@ def read_packets():
         line = line.strip()
         try:
             handle_packet(line)
-        except ValueError:
-            print('Error reading packets.')
+        except ValueError as e:
+            print('Error reading packets.' + str(e))
 
 def parse_args():
     '''
@@ -172,15 +183,17 @@ def parse_args():
     
     return parser.parse_args()
 
-def print_rules():
-    for rule in rules:
-        print(rule)
-
+def print_list(list):
+    i = 1
+    for item in list:
+        print('{}: {}'.format(i, item))
+        i += 1
 def main():
     args = parse_args()
     read_configs(args.rules_filename)
-    # print_rules()
+    # print_list(rules)
     read_packets()
+    # print_list(packets)
 
 if __name__ == '__main__':
     main()
