@@ -2,6 +2,7 @@
 ''' fw.py '''
 
 import sys
+import string
 import argparse
 
 # list of dictinaries
@@ -18,18 +19,21 @@ def create_rule(items):
     rule = {}
 
     if len(items) in (4, 5):
+        # direction
         direction = items[0].lower()
         if direction in ('in', 'out'):
             rule['direction'] = direction
         else:
             raise ValueError('Error: direction unrecogonized.')
         
+        # action
         action = items[1].lower()
         if action in ('accept', 'reject', 'drop'):
             rule['action'] = action
         else:
             raise ValueError('Error: action unrecogonized.')
         
+        # ip
         ip = items[2]
         if (ip == '*') \
             or (ip.count('.') == 3) \
@@ -38,6 +42,7 @@ def create_rule(items):
         else:
             raise ValueError('Error: invalid ip.')
 
+        # port
         port = items[3]
         multi_port = port.split(',')
         if len(multi_port) == 1:
@@ -91,15 +96,34 @@ def read_configs(filename):
     file.close()    
     print('Done reading config file: {}'.format(filename))
 
+def validate_ip(ip):
+    '''
+    validate ipv4
+    source: https://stackoverflow.com/questions/3462784/check-if-a-string-matches-an-ip-address-pattern-in-python
+    '''
+    addr = ip.split('.')
+    if len(addr) != 4:
+        return False
+    for a in addr:
+        if not a.isdigit():
+            return False
+        if not (0 <= int(a) <= 255):
+            return False
+    
+    return True
+
 def verify_packet(dir, ip, port, flag):
     # dir
     if dir not in ('in', 'out'):
         return False
     
     # ip
+    return validate_ip()
     
     # port
     # flag
+
+    retrun True
 
 def handle_packet(packet):
     '''
