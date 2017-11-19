@@ -57,18 +57,28 @@ def ip_2_int(ip):
     
     return result
 
-def compare_ips(packet_ip, rule_ip, mask):
+def compare_ips(packet_ip, rule_ip):
     '''
     checks packet_ip is in rule_ip
     source: https://gist.github.com/chuangbo/3338813
     '''
-    MASK = (1 << 32) - 1
-    
-    packet_ip = ip_2_int(packet_ip)
-    mask = MASK << mask
-    cidr = packet_ip & mask
+    full_ip = rule_ip.split('/')
+    if len(full_ip) == 2:
+        MASK = (1 << 32) - 1
+        
+        rule_ip = str(full_ip[0])
+        subnet = int(full_ip[1])
 
-    return ip_2_int(rule_ip) & cidr == cidr
+        packet_ip = ip_2_int(packet_ip)
+       
+        subnet = MASK << subnet
+        cidr = packet_ip & subnet
+
+        return ip_2_int(rule_ip) & cidr == cidr
+    elif len(full_ip) == 1:
+        return packet_ip == rule_ip
+    else:
+        raise ValueError('Error: invalid ip.')
 
 
 def create_rule(items):
