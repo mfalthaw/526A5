@@ -111,9 +111,10 @@ def create_rule(items):
         # port
         port = items[3]
         multi_port = port.split(',')
+        rule['port'] = []
         if len(multi_port) == 1:
             if (port == '*') or (int(port) in range(0, 65536)):
-                rule['port'] = port
+                rule['port'].append(port)
             else:
                 raise ValueError('Error: invalid port.')
         elif len(multi_port) > 1:
