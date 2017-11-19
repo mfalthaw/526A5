@@ -2,7 +2,6 @@
 ''' fw.py '''
 
 import sys
-import string
 import argparse
 
 import utils
@@ -10,79 +9,6 @@ import utils
 # list of dictionaries
 rules = []
 packets = []
-
-DEBUG = True
-
-def create_rule(items):
-    '''
-    create a rule for each configuration line
-    @param items: each line must have 4 to 5 items
-    line format: <direction> <action> <ip> <port> [flag]
-    '''
-    rule = {}
-
-    if len(items) in (4, 5):
-        # direction
-        direction = items[0].lower()
-        if direction in ('in', 'out'):
-            rule['direction'] = direction
-        else:
-            raise ValueError('Error: direction unrecognized.')
-        
-        # action
-        action = items[1].lower()
-        if action in ('accept', 'reject', 'drop'):
-            rule['action'] = action
-        else:
-            raise ValueError('Error: action unrecognized.')
-        
-        # ip
-        ip = items[2]
-        if ip == '*':
-            rule['ip'] = ip
-        elif ip.count('/') == 1:
-            addr, mask = ip.split('/')
-            if validate_ip(addr):
-                # TODO handle mask
-                rule['ip'] = ip
-            else:
-                raise ValueError('Error: invalid ip.')
-        else:
-            raise ValueError('Error: invalid ip.')
-
-        # port
-        port = items[3]
-        multi_port = port.split(',')
-        if len(multi_port) == 1:
-            if (port == '*') or (int(port) in range(0, 65536)):
-                rule['port'] = port
-            else:
-                raise ValueError('Error: invalid port.')
-        elif len(multi_port) > 1:
-            ports = []
-            for p in multi_port:
-                p = int(p)
-                if p in range(0, 65536):
-                    ports.append(p)
-            rule['port'] = ports
-        else:
-            raise ValueError('Error: invalid port.')
-
-        if len(items) == 5:
-            # if flag used
-            flag = items[4].lower()
-            if flag == 'established':
-                rule['flag'] = flag
-            else:
-                raise ValueError('Error: invalid flag.')
-        else:
-            rule['flag'] = None
-    # unsupported length
-    else:
-        raise ValueError('Error: line contains unexpected number of items: {}\nMust be 4 or 5.'.format(len(items)))
-    
-    # return new rule
-    return rule
 
 def read_configs(filename):
     '''
@@ -95,44 +21,12 @@ def read_configs(filename):
             line = line.strip()
             items = line.split()
             try:
-                rules.append(create_rule(items))
+                rules.append(utils.create_rule(items))
             except ValueError as e:
-                log(e)
+                utils.log(e)
 
     file.close()    
-    log('Done reading config file: {}'.format(filename))
-
-def validate_ip(ip):
-    '''
-    validate ipv4
-    source: https://stackoverflow.com/questions/3462784/check-if-a-string-matches-an-ip-address-pattern-in-python
-    '''
-    addr = ip.split('.')
-    if len(addr) != 4:
-        return False
-    for a in addr:
-        if not a.isdigit():
-            return False
-        if not (0 <= int(a) <= 255):
-            return False
-    
-    return True
-
-def verify_packet(dir, ip, port, flag):
-    # dir
-    if dir not in ('in', 'out'):
-        return False
-    # ip
-    if not validate_ip(ip):
-        return False
-    # port
-    if int(port) not in range(0, 65536):
-        return False
-    # flag
-    if flag not in ('1', '0'):
-        return False
-
-    return True
+    utils.log('Done reading config file: {}'.format(filename))
 
 def handle_packet(packet):
     '''
@@ -146,7 +40,7 @@ def handle_packet(packet):
     except ValueError:
         raise ValueError('Can\'t split packet.')
 
-    verified = verify_packet(dir, ip, port, flag)
+    verified = utils.verify_packet(dir, ip, port, flag)
     if not verified:
         raise ValueError('Error: invalid packet.')
     
@@ -168,8 +62,8 @@ def read_packets():
         try:
             handle_packet(line)
         except ValueError as e:
-            log('Error reading packets.' + str(e))
-    log('Done reading packets file.')
+            utils.log('Error reading packets.' + str(e))
+    utils.log('Done reading packets file.')
 
 def parse_args():
     '''
@@ -185,23 +79,13 @@ def parse_args():
     
     return parser.parse_args()
 
-def print_list(list):
-    i = 1
-    for item in list:
-        print('{}: {}'.format(i, item))
-        i += 1
-
-def log(msg):
-    if DEBUG:
-        print(msg, file=sys.stderr)
-
 def main():
     args = parse_args()
     read_configs(args.rules_filename)
     # print_list(rules)
-    read_packets()
+    # read_packets()
     # print_list(packets)
-    # print(utils.compare_ips('8.8.7.8', '8.8.8.8', 8))
+    print(utils.compare_ips('8.8.8.255', '8.8.8.8', 8))
 
 if __name__ == '__main__':
     main()
