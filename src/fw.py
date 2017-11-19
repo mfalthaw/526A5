@@ -64,7 +64,6 @@ def create_rule(items):
                     ports.append(p)
             rule['port'] = ports
         else:
-            print('port: {}'.format(multi_port))
             raise ValueError('Error: invalid port.')
 
         if len(items) == 5:
@@ -96,11 +95,10 @@ def read_configs(filename):
             try:
                 rules.append(create_rule(items))
             except ValueError as e:
-                if DEBUG:
-                    print(e)
+                log(e)
 
     file.close()    
-    print('Done reading config file: {}'.format(filename))
+    log('Done reading config file: {}'.format(filename))
 
 def validate_ip(ip):
     '''
@@ -168,7 +166,8 @@ def read_packets():
         try:
             handle_packet(line)
         except ValueError as e:
-            print('Error reading packets.' + str(e))
+            log('Error reading packets.' + str(e))
+    log('Done reading packets file.')
 
 def parse_args():
     '''
@@ -189,6 +188,10 @@ def print_list(list):
     for item in list:
         print('{}: {}'.format(i, item))
         i += 1
+
+def log(msg):
+    if DEBUG:
+        print(msg, file=sys.stderr)
 
 def main():
     args = parse_args()
