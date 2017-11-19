@@ -188,6 +188,7 @@ def print_list(list):
     for item in list:
         print('{}: {}'.format(i, item))
         i += 1
+
 def main():
     args = parse_args()
     read_configs(args.rules_filename)
