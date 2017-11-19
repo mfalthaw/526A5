@@ -52,6 +52,8 @@ def handle_packet(packet):
     packets.append(packet_dic)
     
     # compare to rules and emit results
+    res = utils.handle_packet(packet_dic, rules)
+    print(res)
 
 def read_packets():
     '''
@@ -82,12 +84,10 @@ def parse_args():
 def main():
     args = parse_args()
     read_configs(args.rules_filename)
-    utils.print_list(rules)
+    # utils.print_list(rules)
     read_packets()
-    utils.print_list(packets)
-    print(utils.compare_ips('8.8.8.255', '8.8.8.8/8'))
-    print(utils.compare_ips('8.8.8.255', '8.8.8.256'))
-    print(utils.compare_ips('8.8.8.255', '8.8.8.255'))
+    # utils.print_list(packets)
+    # print(utils.compare_ips('136.159.5.6', '136.159.5.5/30'))
 
 if __name__ == '__main__':
     main()

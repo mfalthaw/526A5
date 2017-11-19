@@ -15,6 +15,30 @@ def log(msg):
     if DEBUG:
         print(msg, file=sys.stderr)
 
+def handle_packet(packet, rules):
+    '''
+    handle packet based on rules
+    packet format: <direction> <ip> <port> <flag> 
+    '''
+    counter = 0
+    for rule in rules:
+        counter += 1
+        # eleminate not matched scenarios
+        if packet['flag'] == 0 and rule['flag'] == 1:
+            # if rule only applies to established
+            continue
+        if packet['direction'] != rule['direction']:
+            continue
+        if (rule['port'] != '*') and (packet['port'] not in rule['port']):
+            continue
+        if not compare_ips(packet['ip'], rule['ip']):
+            continue
+
+        # passed elemination phase
+        return '---{}({}) {} {} {} {} '.format(rule['action'], counter, packet['direction'], packet['ip'], packet['port'], packet['flag'])
+    # no matching rules
+    return 'drop() {} {} {} {} '.format(packet['direction'], packet['ip'], packet['port'], packet['flag'])
+
 def validate_ip(ip):
     '''
     validate ipv4
@@ -62,12 +86,14 @@ def compare_ips(packet_ip, rule_ip):
     checks packet_ip is in rule_ip
     source: https://gist.github.com/chuangbo/3338813
     '''
+    if rule_ip == '*':
+        return True
     full_ip = rule_ip.split('/')
     if len(full_ip) == 2:
         MASK = (1 << 32) - 1
         
         rule_ip = str(full_ip[0])
-        subnet = int(full_ip[1])
+        subnet = 32-int(full_ip[1])
 
         packet_ip = ip_2_int(packet_ip)
        
@@ -141,7 +167,8 @@ def create_rule(items):
             # if flag used
             flag = items[4].lower()
             if flag == 'established':
-                rule['flag'] = flag
+                # store as 1 for easiness
+                rule['flag'] = '1'
             else:
                 raise ValueError('Error: invalid flag.')
         else:
