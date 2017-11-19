@@ -91,10 +91,30 @@ def read_configs(filename):
     file.close()    
     print('Done reading config file: {}'.format(filename))
 
+def verify_packet(dir, ip, port, flag):
+    # dir
+    if dir not in ('in', 'out'):
+        return False
+    
+    # ip
+    
+    # port
+    # flag
+
 def handle_packet(packet):
     '''
     handle packet based on rules
     '''
+    try:
+        dir, ip, port, flag = packet.split()
+    except ValueError:
+        raise ValueError('Can\'t split packet.')
+    
+    verified = verify_packet(dir, ip, port, flag)
+    if not verified:
+        raise ValueError('Error: invalid packet.')
+    
+    # compare to rules and emit resuls
 
 def read_packets():
     '''
@@ -103,10 +123,9 @@ def read_packets():
     for line in sys.stdin:
         line = line.strip()
         try:
-            packet = line.split()
-            handle_packet(packet)
-        except ValueError:
-            print('Error reading packets.')
+            handle_packet(line)
+        except ValueError, e:
+            print('Error reading packets.' + e)
 
 def parse_args():
     '''
