@@ -24,22 +24,24 @@ def handle_packet(packet, rules):
     for rule in rules:
         counter += 1
         # eleminate not matched scenarios
+        if rule == 'None':
+            continue
         if packet['flag'] == '0' and rule['flag'] == '1':
             # if rule only applies to established
             # if counter == 2:
-            #     print('drop flag')
+                # print('drop flag', file=sys.stderr)
             continue
         if packet['direction'] != rule['direction']:
             # if counter == 2:
-            #     print('drop direc')
+                # print('drop direc', file=sys.stderr)
             continue
         if not compare_ports(packet['port'], rule['port']):
             # if counter == 2:
-            #     print('drop port')
+                # print('drop port', file=sys.stderr)
             continue
         if not compare_ips(packet['ip'], rule['ip']):
             # if counter == 2:
-            #     print('drop ip')
+                # print('drop ip', file=sys.stderr)
             continue
         
         return '{}({}) {} {} {} {} '.format(rule['action'], counter, packet['direction'], packet['ip'], packet['port'], packet['flag'])
@@ -83,7 +85,7 @@ def compare_ports(packet_port, rule_ports):
         return True
     return False
 
-def ip_2_int(ip):
+def ip_to_int(ip):
     '''
     convert ip to int
     source: https://stackoverflow.com/questions/5619685/conversion-from-ip-string-to-integer-and-backward-in-python
@@ -92,6 +94,9 @@ def ip_2_int(ip):
     result = (16777216 * chuncks[0]) + (65536 * chuncks[1]) + (256 * chuncks[2]) + chuncks[3]
     
     return result
+
+def ip_to_bin(ip):
+    return ''.join([bin(int(x)+256)[3:] for x in ip.split('.')])
 
 def compare_ips(packet_ip, rule_ip):
     '''
@@ -103,14 +108,21 @@ def compare_ips(packet_ip, rule_ip):
 
     full_ip = rule_ip.split('/')
     if len(full_ip) == 2:
-        MASK = (1 << 32) - 1
-        subnet = 32 - int(full_ip[1])
-        rule_ip = ip_2_int(full_ip[0])
+        # MASK = (1 << 32) - 1
+        # subnet = 32 - int(full_ip[1])
+        # rule_ip = ip_to_int(full_ip[0])
        
-        subnet = MASK << subnet
-        cidr = rule_ip & subnet
+        # subnet = MASK << subnet
+        # cidr = rule_ip & subnet
 
-        return (ip_2_int(packet_ip) & cidr) == cidr
+        # return (ip_to_int(packet_ip) & cidr) == cidr
+
+        rule_ip = ip_to_bin(full_ip[0])
+        packet_ip = ip_to_bin(packet_ip)
+        subnet = full_ip[1]
+        mask = rule_ip[0:int(subnet)]
+        
+        return packet_ip.startswith(mask)
     elif len(full_ip) == 1:
         return packet_ip == rule_ip
     else:

@@ -19,6 +19,12 @@ def read_configs(filename):
     with open(filename) as file:
         for line in file:
             line = line.strip()
+            if line.startswith('#'):
+                rules.append('None')
+                continue
+            elif line == '':
+                rules.append('None')
+                continue
             items = line.split()
             try:
                 rules.append(utils.create_rule(items))
@@ -52,8 +58,8 @@ def handle_packet(packet):
     packets.append(packet_dic)
     
     # compare to rules and emit results
-    # res = utils.handle_packet(packet_dic, rules)
-    # print(res)
+    res = utils.handle_packet(packet_dic, rules)
+    print(res)
 
 def read_packets():
     '''
@@ -87,7 +93,7 @@ def main():
     # utils.print_list(rules)
     read_packets()
     # utils.print_list(packets)
-    print(utils.compare_ips('10.0.0.2', '10.0.0.0/31'))
+    # print(utils.compare_ips('10.0.0.2', '10.0.0.0/31'))
 
 
 if __name__ == '__main__':
