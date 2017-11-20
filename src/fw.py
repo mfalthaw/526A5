@@ -87,7 +87,8 @@ def main():
     # utils.print_list(rules)
     read_packets()
     # utils.print_list(packets)
-    # print(utils.compare_ips('136.159.5.6', '136.159.5.5/30'))
+    # print(utils.compare_ips('136.159.5.6', '*'))
+
 
 if __name__ == '__main__':
     main()

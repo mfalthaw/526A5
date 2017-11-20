@@ -24,16 +24,19 @@ def handle_packet(packet, rules):
     for rule in rules:
         counter += 1
         # eleminate not matched scenarios
-        if packet['flag'] == 0 and rule['flag'] == 1:
+        if packet['flag'] == '0' and rule['flag'] == '1':
             # if rule only applies to established
             continue
         if packet['direction'] != rule['direction']:
             continue
-        if (rule['port'] != '*') and (packet['port'] not in rule['port']):
+        if ('*' not in rule['port']) and (packet['port'] not in rule['port']):
             continue
         if not compare_ips(packet['ip'], rule['ip']):
             continue
-
+        
+        # if (packet['direction'] == rule['direction']) \
+        # and (rule['port'] == '*') or (packet['port'] in rule['port']) \
+        # and compare_ips(packet['ip'], rule['ip']):
         # passed elemination phase
         return '---{}({}) {} {} {} {} '.format(rule['action'], counter, packet['direction'], packet['ip'], packet['port'], packet['flag'])
     # no matching rules
@@ -88,6 +91,7 @@ def compare_ips(packet_ip, rule_ip):
     '''
     if rule_ip == '*':
         return True
+
     full_ip = rule_ip.split('/')
     if len(full_ip) == 2:
         MASK = (1 << 32) - 1
