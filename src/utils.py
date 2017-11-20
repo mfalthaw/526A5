@@ -26,19 +26,23 @@ def handle_packet(packet, rules):
         # eleminate not matched scenarios
         if packet['flag'] == '0' and rule['flag'] == '1':
             # if rule only applies to established
+            # if counter == 2:
+            #     print('drop flag')
             continue
         if packet['direction'] != rule['direction']:
+            # if counter == 2:
+            #     print('drop direc')
             continue
-        if ('*' not in rule['port']) and (packet['port'] not in rule['port']):
+        if not compare_ports(packet['port'], rule['port']):
+            # if counter == 2:
+            #     print('drop port')
             continue
         if not compare_ips(packet['ip'], rule['ip']):
+            # if counter == 2:
+            #     print('drop ip')
             continue
         
-        # if (packet['direction'] == rule['direction']) \
-        # and (rule['port'] == '*') or (packet['port'] in rule['port']) \
-        # and compare_ips(packet['ip'], rule['ip']):
-        # passed elemination phase
-        return '---{}({}) {} {} {} {} '.format(rule['action'], counter, packet['direction'], packet['ip'], packet['port'], packet['flag'])
+        return '{}({}) {} {} {} {} '.format(rule['action'], counter, packet['direction'], packet['ip'], packet['port'], packet['flag'])
     # no matching rules
     return 'drop() {} {} {} {} '.format(packet['direction'], packet['ip'], packet['port'], packet['flag'])
 
@@ -74,13 +78,18 @@ def verify_packet(dir, ip, port, flag):
 
     return True
 
+def compare_ports(packet_port, rule_ports):
+    if ('*' in rule_ports) or (packet_port in rule_ports):
+        return True
+    return False
+
 def ip_2_int(ip):
     '''
     convert ip to int
     source: https://stackoverflow.com/questions/5619685/conversion-from-ip-string-to-integer-and-backward-in-python
     '''
-    chucks = list(map(int, ip.split('.')))
-    result = (16777216 * chucks[0]) + (65536 * chucks[1]) + (256 * chucks[2]) + chucks[3]
+    chuncks = list(map(int, ip.split('.')))
+    result = (16777216 * chuncks[0]) + (65536 * chuncks[1]) + (256 * chuncks[2]) + chuncks[3]
     
     return result
 
@@ -95,16 +104,13 @@ def compare_ips(packet_ip, rule_ip):
     full_ip = rule_ip.split('/')
     if len(full_ip) == 2:
         MASK = (1 << 32) - 1
-        
-        rule_ip = str(full_ip[0])
-        subnet = 32-int(full_ip[1])
-
-        packet_ip = ip_2_int(packet_ip)
+        subnet = 32 - int(full_ip[1])
+        rule_ip = ip_2_int(full_ip[0])
        
         subnet = MASK << subnet
-        cidr = packet_ip & subnet
+        cidr = rule_ip & subnet
 
-        return ip_2_int(rule_ip) & cidr == cidr
+        return (ip_2_int(packet_ip) & cidr) == cidr
     elif len(full_ip) == 1:
         return packet_ip == rule_ip
     else:
@@ -160,8 +166,7 @@ def create_rule(items):
         elif len(multi_port) > 1:
             ports = []
             for p in multi_port:
-                p = int(p)
-                if p in range(0, 65536):
+                if int(p) in range(0, 65536):
                     ports.append(p)
             rule['port'] = ports
         else:

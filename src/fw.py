@@ -5,6 +5,8 @@ import sys
 import argparse
 
 import utils
+import cidr
+import ipaddress
 
 # list of dictionaries
 rules = []
@@ -52,8 +54,8 @@ def handle_packet(packet):
     packets.append(packet_dic)
     
     # compare to rules and emit results
-    res = utils.handle_packet(packet_dic, rules)
-    print(res)
+    # res = utils.handle_packet(packet_dic, rules)
+    # print(res)
 
 def read_packets():
     '''
@@ -87,7 +89,9 @@ def main():
     # utils.print_list(rules)
     read_packets()
     # utils.print_list(packets)
-    # print(utils.compare_ips('136.159.5.6', '*'))
+    print(utils.compare_ips('10.0.0.2', '10.0.0.0/31'))
+    print('10.0.0.2' in cidr.CIDR('10.0.0.0', 31))
+    print(ipaddress.ip_address('10.0.0.2') in ipaddress.ip_network('10.0.0.0/31'))
 
 
 if __name__ == '__main__':
