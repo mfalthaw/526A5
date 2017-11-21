@@ -14,7 +14,6 @@ def print_list(list):
 def log(msg):
     if DEBUG:
         print(msg, file=sys.stderr)
-        # print(msg)
 
 def handle_packet(packet, rules):
     '''
@@ -104,20 +103,10 @@ def compare_ips(packet_ip, rule_ip):
 
     full_ip = rule_ip.split('/')
     if len(full_ip) == 2:
-        # MASK = (1 << 32) - 1
-        # subnet = 32 - int(full_ip[1])
-        # rule_ip = ip_to_int(full_ip[0])
-       
-        # subnet = MASK << subnet
-        # cidr = rule_ip & subnet
-
-        # return (ip_to_int(packet_ip) & cidr) == cidr
-
         rule_ip = ip_to_bin(full_ip[0])
         packet_ip = ip_to_bin(packet_ip)
         subnet = full_ip[1]
         mask = rule_ip[0:int(subnet)]
-        
         return packet_ip.startswith(mask)
     elif len(full_ip) == 1:
         return packet_ip == rule_ip
