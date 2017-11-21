@@ -19,12 +19,6 @@ def read_configs(filename):
     with open(filename) as file:
         for line in file:
             line = line.strip()
-            if line.startswith('#'):
-                rules.append('None')
-                continue
-            elif line == '':
-                rules.append('None')
-                continue
             items = line.split()
             try:
                 rules.append(utils.create_rule(items))

@@ -1,9 +1,9 @@
 resFiles = ['tests/res1.txt', 
 			'tests/res2.txt', 
 			'tests/res3.txt']
-refFiles = ['./tests-files/results1.txt', 
-			'./tests-files/results2.txt', 
-			'./tests-files/results3.txt']
+refFiles = ['./test-files/results1.txt', 
+			'./test-files/results2.txt', 
+			'./test-files/results3.txt']
 
 for f in range(3):
 	print('Round {}.'.format(f+1))
