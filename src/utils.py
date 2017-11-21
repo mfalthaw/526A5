@@ -44,9 +44,9 @@ def handle_packet(packet, rules):
                 # print('drop ip', file=sys.stderr)
             continue
         
-        return '{}({}) {} {} {} {} '.format(rule['action'], counter, packet['direction'], packet['ip'], packet['port'], packet['flag'])
+        return '{}({}) {} {} {} {}'.format(rule['action'], counter, packet['direction'], packet['ip'], packet['port'], packet['flag'])
     # no matching rules
-    return 'drop() {} {} {} {} '.format(packet['direction'], packet['ip'], packet['port'], packet['flag'])
+    return 'drop() {} {} {} {}'.format(packet['direction'], packet['ip'], packet['port'], packet['flag'])
 
 def validate_ip(ip):
     '''
