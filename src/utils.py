@@ -138,14 +138,16 @@ def create_rule(items):
         if direction in ('in', 'out'):
             rule['direction'] = direction
         else:
-            raise ValueError('Warning: direction unrecognized.')
+            log('Warning: direction unrecognized.')
+            return 'None'
         
         # action
         action = items[1].lower()
         if action in ('accept', 'reject', 'drop'):
             rule['action'] = action
         else:
-            raise ValueError('Warning: action unrecognized.')
+            log('Warning: action unrecognized.')
+            return 'None'
         
         # ip
         ip = items[2]
@@ -157,9 +159,11 @@ def create_rule(items):
                 # TODO handle mask
                 rule['ip'] = ip
             else:
-                raise ValueError('Warning: invalid ip.')
+                log('Warning: invalid ip.')
+                return 'None'
         else:
-            raise ValueError('Warning: invalid ip.')
+            log('Warning: invalid ip.')
+            return 'None'
 
         # port
         port = items[3]
@@ -169,7 +173,8 @@ def create_rule(items):
             if (port == '*') or (int(port) in range(0, 65536)):
                 rule['port'].append(port)
             else:
-                raise ValueError('Warning: invalid port.')
+                log('Warning: invalid port.')
+                return 'None'
         elif len(multi_port) > 1:
             ports = []
             for p in multi_port:
@@ -177,7 +182,8 @@ def create_rule(items):
                     ports.append(p)
             rule['port'] = ports
         else:
-            raise ValueError('Warning: invalid port.')
+            log('Warning: invalid port.')
+            return 'None'
 
         if len(items) == 5:
             # if flag used
@@ -186,12 +192,14 @@ def create_rule(items):
                 # store as 1 for easiness
                 rule['flag'] = '1'
             else:
-                raise ValueError('Error: invalid flag.')
+                log('Error: invalid flag.')
+                return 'None'
         else:
             rule['flag'] = None
     # unsupported length
     else:
-        raise ValueError('Warning: line contains unexpected number of items: {}Must be 4 or 5.'.format(len(items)))
+        log('Warning: line contains unexpected number of items: {}Must be 4 or 5.'.format(len(items)))
+        return 'None'
     
     # return new rule
     return rule
