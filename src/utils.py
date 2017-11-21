@@ -27,21 +27,12 @@ def handle_packet(packet, rules):
         if rule == 'None':
             continue
         if packet['flag'] == '0' and rule['flag'] == '1':
-            # if rule only applies to established
-            # if counter == 2:
-                # print('drop flag', file=sys.stderr)
             continue
         if packet['direction'] != rule['direction']:
-            # if counter == 2:
-                # print('drop direc', file=sys.stderr)
             continue
         if not compare_ports(packet['port'], rule['port']):
-            # if counter == 2:
-                # print('drop port', file=sys.stderr)
             continue
         if not compare_ips(packet['ip'], rule['ip']):
-            # if counter == 2:
-                # print('drop ip', file=sys.stderr)
             continue
         
         return '{}({}) {} {} {} {}'.format(rule['action'], counter, packet['direction'], packet['ip'], packet['port'], packet['flag'])
@@ -51,7 +42,7 @@ def handle_packet(packet, rules):
 def validate_ip(ip):
     '''
     validate ipv4
-    source: https://stackoverflow.com/questions/3462784/check-if-a-string-matches-an-ip-address-pattern-in-python
+    source: https://stackoverflow.com/questions/3462784
     '''
     addr = ip.split('.')
     if len(addr) != 4:
@@ -88,7 +79,7 @@ def compare_ports(packet_port, rule_ports):
 def ip_to_int(ip):
     '''
     convert ip to int
-    source: https://stackoverflow.com/questions/5619685/conversion-from-ip-string-to-integer-and-backward-in-python
+    source: https://stackoverflow.com/questions/5619685
     '''
     chuncks = list(map(int, ip.split('.')))
     result = (16777216 * chuncks[0]) + (65536 * chuncks[1]) + (256 * chuncks[2]) + chuncks[3]
@@ -96,6 +87,10 @@ def ip_to_int(ip):
     return result
 
 def ip_to_bin(ip):
+    '''
+    convert ip in dotten notaiton to binary
+    source: https://stackoverflow.com/questions/2733788
+    '''
     return ''.join([bin(int(x)+256)[3:] for x in ip.split('.')])
 
 def compare_ips(packet_ip, rule_ip):
@@ -143,14 +138,14 @@ def create_rule(items):
         if direction in ('in', 'out'):
             rule['direction'] = direction
         else:
-            raise ValueError('Error: direction unrecognized.')
+            raise ValueError('Warning: direction unrecognized.')
         
         # action
         action = items[1].lower()
         if action in ('accept', 'reject', 'drop'):
             rule['action'] = action
         else:
-            raise ValueError('Error: action unrecognized.')
+            raise ValueError('Warning: action unrecognized.')
         
         # ip
         ip = items[2]
@@ -162,9 +157,9 @@ def create_rule(items):
                 # TODO handle mask
                 rule['ip'] = ip
             else:
-                raise ValueError('Error: invalid ip.')
+                raise ValueError('Warning: invalid ip.')
         else:
-            raise ValueError('Error: invalid ip.')
+            raise ValueError('Warning: invalid ip.')
 
         # port
         port = items[3]
@@ -174,7 +169,7 @@ def create_rule(items):
             if (port == '*') or (int(port) in range(0, 65536)):
                 rule['port'].append(port)
             else:
-                raise ValueError('Error: invalid port.')
+                raise ValueError('Warning: invalid port.')
         elif len(multi_port) > 1:
             ports = []
             for p in multi_port:
@@ -182,7 +177,7 @@ def create_rule(items):
                     ports.append(p)
             rule['port'] = ports
         else:
-            raise ValueError('Error: invalid port.')
+            raise ValueError('Warning: invalid port.')
 
         if len(items) == 5:
             # if flag used
@@ -196,7 +191,7 @@ def create_rule(items):
             rule['flag'] = None
     # unsupported length
     else:
-        raise ValueError('Error: line contains unexpected number of items: {}\nMust be 4 or 5.'.format(len(items)))
+        raise ValueError('Warning: line contains unexpected number of items: {}Must be 4 or 5.'.format(len(items)))
     
     # return new rule
     return rule
