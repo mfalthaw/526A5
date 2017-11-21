@@ -84,11 +84,7 @@ def parse_args():
 def main():
     args = parse_args()
     read_configs(args.rules_filename)
-    # utils.print_list(rules)
     read_packets()
-    # utils.print_list(packets)
-    # print(utils.compare_ips('10.0.0.2', '10.0.0.0/31'))
-
 
 if __name__ == '__main__':
     main()
