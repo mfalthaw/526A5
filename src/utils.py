@@ -76,16 +76,6 @@ def compare_ports(packet_port, rule_ports):
         return True
     return False
 
-def ip_to_int(ip):
-    '''
-    convert ip to int
-    source: https://stackoverflow.com/questions/5619685
-    '''
-    chuncks = list(map(int, ip.split('.')))
-    result = (16777216 * chuncks[0]) + (65536 * chuncks[1]) + (256 * chuncks[2]) + chuncks[3]
-    
-    return result
-
 def ip_to_bin(ip):
     '''
     convert ip in dotten notaiton to binary
