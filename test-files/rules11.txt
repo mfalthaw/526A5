@@ -1,0 +1,4 @@
+in accept 123.123.123.123/32 22,80,90 established
+in\taccept\t\t123.123.123.123/32 22,80,90\t established
+in accept 123.123.123.123/32 22,80,90\testablished
+# comment\tline

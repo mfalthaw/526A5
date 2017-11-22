@@ -19,6 +19,7 @@ def read_configs(filename):
     with open(filename) as file:
         for line in file:
             line = line.strip()
+            line = line.replace('\\t', ' ')
             items = line.split()
             try:
                 rules.append(utils.create_rule(items))
@@ -84,6 +85,7 @@ def parse_args():
 def main():
     args = parse_args()
     read_configs(args.rules_filename)
+    utils.print_list(rules)
     read_packets()
 
 if __name__ == '__main__':
