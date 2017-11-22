@@ -135,8 +135,10 @@ def create_rule(items):
             rule['ip'] = ip
         elif ip.count('/') == 1:
             addr, mask = ip.split('/')
+            if not (8 <= int(mask) <= 32):
+                log('---Warning: invalid ip subnet.')
+                return 'None'
             if validate_ip(addr):
-                # TODO handle mask
                 rule['ip'] = ip
             else:
                 log('---Warning: invalid ip.')
