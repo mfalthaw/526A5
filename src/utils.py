@@ -15,6 +15,14 @@ def log(msg):
     if DEBUG:
         print(msg, file=sys.stderr)
 
+def remove_invalid_chars(line):
+    clean_line = line.replace('\\t', ' ')
+    clean_line = clean_line.replace('\\n', ' ')
+    clean_line = clean_line.replace('\\v', ' ')
+    clean_line = clean_line.replace('\\f', ' ')
+    clean_line = clean_line.replace('\\r', ' ')
+    return clean_line
+
 def handle_packet(packet, rules):
     '''
     handle packet based on rules
@@ -118,7 +126,7 @@ def create_rule(items):
         if direction in ('in', 'out'):
             rule['direction'] = direction
         else:
-            log('---Warning: direction unrecognized.')
+            log('Warning: direction unrecognized.')
             return 'None'
         
         # action
@@ -126,7 +134,7 @@ def create_rule(items):
         if action in ('accept', 'reject', 'drop'):
             rule['action'] = action
         else:
-            log('---Warning: action unrecognized.')
+            log('Warning: action unrecognized.')
             return 'None'
         
         # ip
@@ -136,15 +144,15 @@ def create_rule(items):
         elif ip.count('/') == 1:
             addr, mask = ip.split('/')
             if not (8 <= int(mask) <= 32):
-                log('---Warning: invalid ip subnet.')
+                log('Warning: invalid ip subnet.')
                 return 'None'
             if validate_ip(addr):
                 rule['ip'] = ip
             else:
-                log('---Warning: invalid ip.')
+                log('Warning: invalid ip.')
                 return 'None'
         else:
-            log('---Warning: invalid ip.')
+            log('Warning: invalid ip.')
             return 'None'
 
         # port
@@ -155,7 +163,7 @@ def create_rule(items):
             if (port == '*') or (int(port) in range(0, 65536)):
                 rule['port'].append(port)
             else:
-                log('---Warning: invalid port.')
+                log('Warning: invalid port.')
                 return 'None'
         elif len(multi_port) > 1:
             ports = []
@@ -164,7 +172,7 @@ def create_rule(items):
                     ports.append(p)
             rule['port'] = ports
         else:
-            log('---Warning: invalid port.')
+            log('Warning: invalid port.')
             return 'None'
 
         if len(items) == 5:
@@ -180,7 +188,7 @@ def create_rule(items):
             rule['flag'] = None
     # unsupported length
     else:
-        log('---Warning: line contains unexpected number of items: {}. Must be 4 or 5.'.format(len(items)))
+        log('Warning: line contains unexpected number of items: {}. Must be 4 or 5.'.format(len(items)))
         return 'None'
     
     # return new rule

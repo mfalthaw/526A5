@@ -18,16 +18,12 @@ def read_configs(filename):
 
     with open(filename) as file:
         for line in file:
+            line = line.strip()
             if not (line.startswith('in') or line.startswith('out')):
-                utils.log('---Warning: invalid rule.')
+                utils.log('Warning: invalid rule.')
                 rules.append('None')
                 continue
-            line = line.strip()
-            line = line.replace('\\t', ' ')
-            line = line.replace('\\n', ' ')
-            line = line.replace('\\v', ' ')
-            line = line.replace('\\f', ' ')
-            line = line.replace('\\r', ' ')
+            line = utils.remove_invalid_chars(line)
             items = line.split()
             try:
                 rules.append(utils.create_rule(items))
@@ -51,7 +47,7 @@ def handle_packet(packet):
 
     verified = utils.verify_packet(dir, ip, port, flag)
     if not verified:
-        raise ValueError('Error: invalid packet.')
+        raise ValueError('Invalid packet.')
     
     packet_dic['direction'] = dir
     packet_dic['ip'] = ip
@@ -69,14 +65,15 @@ def read_packets():
     read packet file from stdin
     '''
     for line in sys.stdin:
-        if not (line.startswith('in') or line.startswith('out')):
-            utils.log('---Warning: invalid packet.')
-            continue
         line = line.strip()
+        if not (line.startswith('in') or line.startswith('out')):
+            utils.log('Warning: invalid packet.')
+            continue
+        line = utils.remove_invalid_chars(line)
         try:
             handle_packet(line)
         except ValueError as e:
-            utils.log('Error reading packets. ' + str(e))
+            utils.log('Warning: ' + str(e))
     utils.log('Done reading packets file.')
 
 def parse_args():
