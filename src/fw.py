@@ -70,6 +70,9 @@ def read_packets():
             utils.log('Warning: invalid packet.')
             continue
         line = utils.remove_invalid_chars(line)
+        if len(line.split()) != 4:
+            utils.log('Warning: invalid packet.')
+            continue
         try:
             handle_packet(line)
         except ValueError as e:
