@@ -18,8 +18,16 @@ def read_configs(filename):
 
     with open(filename) as file:
         for line in file:
+            if not (line.startswith('in') or line.startswith('out')):
+                utils.log('---Warning: invalid rule.')
+                rules.append('None')
+                continue
             line = line.strip()
             line = line.replace('\\t', ' ')
+            line = line.replace('\\n', ' ')
+            line = line.replace('\\v', ' ')
+            line = line.replace('\\f', ' ')
+            line = line.replace('\\r', ' ')
             items = line.split()
             try:
                 rules.append(utils.create_rule(items))
@@ -61,11 +69,14 @@ def read_packets():
     read packet file from stdin
     '''
     for line in sys.stdin:
+        if not (line.startswith('in') or line.startswith('out')):
+            utils.log('---Warning: invalid packet.')
+            continue
         line = line.strip()
         try:
             handle_packet(line)
         except ValueError as e:
-            utils.log('Error reading packets.' + str(e))
+            utils.log('Error reading packets. ' + str(e))
     utils.log('Done reading packets file.')
 
 def parse_args():
@@ -85,7 +96,6 @@ def parse_args():
 def main():
     args = parse_args()
     read_configs(args.rules_filename)
-    utils.print_list(rules)
     read_packets()
 
 if __name__ == '__main__':
